@@ -1,13 +1,80 @@
-
 version: 2
 
 sources:
   - name: raw
     schema: gz_raw_data
+    description: "BigQuery'deki ham verileri içeren kaynak veri seti"
+
     tables:
       - name: sales
         identifier: raw_gz_sales
+        description: "Satış işlemlerini içeren ham tablo"
+
+        config:
+          loaded_at_field: "cast(date_date as timestamp)"
+          freshness:
+            warn_after:
+              count: 90
+              period: day
+
+        tests:
+          - dbt_utils.unique_combination_of_columns:
+              arguments:
+                combination_of_columns:
+                  - orders_id
+                  - pdt_id
+
+        columns:
+          - name: date_date
+            description: "Satış tarihi"
+
+          - name: orders_id
+            description: "Sipariş kimliği"
+
+          - name: pdt_id
+            description: "Ürün kimliği"
+
+          - name: revenue
+            description: "Satıştan elde edilen gelir"
+
+          - name: quantity
+            description: "Satılan ürün adedi"
+
+
       - name: product
         identifier: raw_gz_product
+        description: "Ürün bilgilerini içeren ham tablo"
+
+        columns:
+          - name: products_id
+            description: "Ürün kimliği"
+            tests:
+              - unique
+              - not_null
+
+          - name: purchse_price
+            description: "Ürünün satın alma fiyatı"
+
+
       - name: ship
         identifier: raw_gz_ship
+        description: "Siparişlerin kargo ve lojistik bilgilerini içeren ham tablo"
+
+        columns:
+          - name: orders_id
+            description: "Sipariş kimliği"
+            tests:
+              - unique
+              - not_null
+
+          - name: shipping_fee
+            description: "Müşteriden alınan kargo ücreti"
+
+          - name: shipping_fee_1
+            description: "Alternatif kargo ücreti alanı"
+
+          - name: logcost
+            description: "Lojistik maliyeti"
+
+          - name: ship_cost
+            description: "Gönderim maliyeti"
