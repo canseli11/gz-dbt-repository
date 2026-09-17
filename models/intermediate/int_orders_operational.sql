@@ -1,5 +1,7 @@
 SELECT
-    o.*,
+    o.orders_id,
+    o.date_date,
+    o.margin,
     s.shipping_fee,
     s.logcost,
     s.ship_cost,
