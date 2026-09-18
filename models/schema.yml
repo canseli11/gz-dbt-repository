@@ -40,7 +40,6 @@ sources:
           - name: quantity
             description: "Satılan ürün adedi"
 
-
       - name: product
         identifier: raw_gz_product
         description: "Ürün bilgilerini içeren ham tablo"
@@ -54,7 +53,6 @@ sources:
 
           - name: purchse_price
             description: "Ürünün satın alma fiyatı"
-
 
       - name: ship
         identifier: raw_gz_ship
@@ -78,3 +76,162 @@ sources:
 
           - name: ship_cost
             description: "Gönderim maliyeti"
+
+      - name: adwords
+        identifier: raw_gz_adwords
+
+      - name: bing
+        identifier: raw_gz_bing
+
+      - name: criteo
+        identifier: raw_gz_criteo
+
+      - name: facebook
+        identifier: raw_gz_facebook
+
+
+models:
+  - name: int_campaigns
+    description: "Adwords, Bing, Criteo ve Facebook kampanya verilerini UNION ALL ile birleştiren ara model."
+
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - date_date
+              - paid_source
+              - campaign_key
+
+    columns:
+      - name: campaign_key
+        description: "Kampanya anahtarı."
+        tests:
+          - not_null
+
+      - name: date_date
+        description: "Kampanya tarihi."
+        tests:
+          - not_null
+
+      - name: paid_source
+        description: "Reklam kampanyasının kaynağı."
+        tests:
+          - not_null
+
+      - name: campaign_name
+        description: "Reklam kampanyasının adı."
+        tests:
+          - not_null
+
+      - name: ads_cost
+        description: "Reklam kampanyasının maliyeti."
+        tests:
+          - not_null
+
+      - name: impression
+        description: "Reklamın gösterim sayısı."
+
+      - name: click
+        description: "Reklamın tıklanma sayısı."
+
+
+  - name: int_campaigns_day
+    description: "Kampanya performansını gün bazında toplulaştıran ara model."
+
+    columns:
+      - name: date_date
+        description: "Kampanya performansının tarihi."
+        tests:
+          - unique
+          - not_null
+
+      - name: ads_cost
+        description: "Günlük toplam reklam maliyeti."
+        tests:
+          - not_null
+
+      - name: ads_impression
+        description: "Günlük toplam reklam gösterim sayısı."
+        tests:
+          - not_null
+
+      - name: ads_clicks
+        description: "Günlük toplam reklam tıklama sayısı."
+        tests:
+          - not_null
+
+
+  - name: finance_campaigns_day
+    description: "Günlük finans ve reklam performansını birleştiren, reklam maliyeti sonrası marjı gösteren finans görünümü."
+
+    columns:
+      - name: date
+        description: "Finans ve kampanya performansının tarihi."
+        tests:
+          - unique
+          - not_null
+
+      - name: ads_margin
+        description: "Operasyonel marjdan reklam maliyetinin çıkarılmasıyla hesaplanan reklam sonrası marj."
+        tests:
+          - not_null
+
+      - name: average_basket
+        description: "Günlük ortalama sepet tutarı."
+        tests:
+          - not_null
+
+      - name: operational_margin
+        description: "Günlük operasyonel marj."
+        tests:
+          - not_null
+
+      - name: ads_cost
+        description: "Günlük toplam reklam maliyeti."
+        tests:
+          - not_null
+
+      - name: ads_impression
+        description: "Günlük toplam reklam gösterim sayısı."
+        tests:
+          - not_null
+
+      - name: ads_clicks
+        description: "Günlük toplam reklam tıklama sayısı."
+        tests:
+          - not_null
+
+      - name: quantity
+        description: "Günlük satılan toplam ürün adedi."
+        tests:
+          - not_null
+
+      - name: revenue
+        description: "Günlük toplam gelir."
+        tests:
+          - not_null
+
+      - name: purchase_cost
+        description: "Günlük toplam satın alma maliyeti."
+        tests:
+          - not_null
+
+      - name: margin
+        description: "Günlük satış marjı."
+        tests:
+          - not_null
+
+      - name: shipping_fee
+        description: "Günlük toplam kargo geliri."
+        tests:
+          - not_null
+
+      - name: log_cost
+        description: "Günlük toplam lojistik maliyeti."
+        tests:
+          - not_null
+
+      - name: ship_cost
+        description: "Günlük toplam gönderim maliyeti."
+        tests:
+          - not_null
